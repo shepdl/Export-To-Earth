@@ -4,7 +4,12 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 import javax.imageio.ImageIO;
 import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewProperties;
@@ -22,13 +27,12 @@ import org.gephi.preview.types.DependantColor;
 public class IconRenderer {
 
     private ArrayList<String> filenames = new ArrayList<String>();
-    private File rootDir;
+	private String lastFilename;
+	private HashMap<String, BufferedImage> images = new HashMap<String, BufferedImage>();
 
-    private String lastFilename;
+	public IconRenderer() {
 
-    public IconRenderer(File rootDir) {
-        this.rootDir = rootDir;
-    }
+	}
 
     public void render (Item item, PreviewProperties pp) {
         Color color = item.getData(NodeItem.COLOR);
@@ -62,13 +66,18 @@ public class IconRenderer {
             graphics.drawOval(borderSize, borderSize, size - borderSize, size - borderSize);
         } 
 
-        File file = new File(rootDir.getPath() + "/" + lastFilename);
-        try {
-            ImageIO.write(img, "png", file);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+		images.put(lastFilename, img);
     }
+
+	public void renderToKMZ(ZipOutputStream out) throws IOException {
+		for (Map.Entry<String, BufferedImage> entry : images.entrySet()) {
+			String filename = entry.getKey();
+			BufferedImage image = entry.getValue();
+			ZipEntry ze = new ZipEntry(filename);
+			out.putNextEntry(ze);
+			ImageIO.write(image, "png", out);
+		}
+	}
 
     public String getLastFilename() {
         return lastFilename;
