@@ -241,6 +241,17 @@ public class KMZExporter implements GraphExporter, ByteExporter, LongTask {
             AttributeRow row = (AttributeRow) e.getAttributes();
             AttributeRow source = (AttributeRow) e.getSource().getAttributes();
             AttributeRow targe = (AttributeRow) e.getTarget().getAttributes();
+            // It's possible for an edge to have a source or target that doesn't
+            // have geocoordinates, so we skip those.
+            if (source == null || targe == null) {
+                continue;
+            }
+            if (source.getValue(latitudeName) == null 
+                    || source.getValue(longitudeName) == null
+                    || targe.getValue(latitudeName) == null 
+                    || targe.getValue(longitudeName) == null) {
+                continue;
+            }
             Color color = (Color) i.getData(EdgeItem.COLOR);
             float weight = (Float) i.getData(EdgeItem.WEIGHT);
 
@@ -255,7 +266,10 @@ public class KMZExporter implements GraphExporter, ByteExporter, LongTask {
                         && (ac.getTitle() == null ? longitudeName != null
                         : !ac.getTitle().equals(longitudeName))) {
 
-                    description += ac.getTitle() + ": " + row.getValue(ac) + "\n";
+                    // Filter labels with null attributes
+                    if (row.getValue(ac) != null) {
+                        description += ac.getTitle() + ": " + row.getValue(ac) + "\n";
+                    }
                 }
             }
 
