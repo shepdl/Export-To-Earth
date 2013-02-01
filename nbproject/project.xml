@@ -43,7 +43,7 @@
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <specification-version>0.8.1.9</specification-version>
+                        <specification-version>0.8.2</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -71,6 +71,15 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
+                    <code-name-base>org.jdesktop.layout</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <release-version>1</release-version>
+                        <specification-version>1.21.1</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
                     <code-name-base>org.openide.util.lookup</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
@@ -79,14 +88,23 @@
                     </run-dependency>
                 </dependency>
             </module-dependencies>
+            <test-dependencies>
+                <test-type>
+                    <name>unit</name>
+                    <test-dependency>
+                        <code-name-base>org.netbeans.libs.junit4</code-name-base>
+                        <compile-dependency/>
+                    </test-dependency>
+                </test-type>
+            </test-dependencies>
             <public-packages/>
-            <class-path-extension>
-                <runtime-relative-path>ext/jaxb-xjc.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/jaxb-xjc.jar</binary-origin>
-            </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/jsr173_1.0_api.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/jsr173_1.0_api.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/JavaAPIforKml-sources.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/JavaAPIforKml-sources.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/jaxb1-impl.jar</runtime-relative-path>
@@ -105,8 +123,8 @@
                 <binary-origin>release/modules/ext/JavaAPIforKml.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/activation.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/activation.jar</binary-origin>
+                <runtime-relative-path>ext/jaxb-impl-javadoc.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/jaxb-impl-javadoc.jar</binary-origin>
             </class-path-extension>
         </data>
     </configuration>

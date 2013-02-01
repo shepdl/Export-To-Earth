@@ -69,6 +69,10 @@ public class KMZExporter implements GraphExporter, ByteExporter, LongTask {
     private File rootDir;
     private OutputStream outputStream;
 
+    private AttributeColumn longitudeColumn;
+    private AttributeColumn latitudeColumn;
+    private AttributeColumn[] columnsToExport;
+
     @Override
     public void setExportVisible(boolean bln) {
         exportVisible = bln;
@@ -77,6 +81,12 @@ public class KMZExporter implements GraphExporter, ByteExporter, LongTask {
     @Override
     public boolean isExportVisible() {
         return exportVisible;
+    }
+
+    public void setColumnsToUse(AttributeColumn longitudeColumn, AttributeColumn latitudeColumn, AttributeColumn[] columnsToExport) {
+        this.longitudeColumn = longitudeColumn;
+        this.latitudeColumn = latitudeColumn;
+        this.columnsToExport = columnsToExport;
     }
 
     @Override
@@ -94,38 +104,21 @@ public class KMZExporter implements GraphExporter, ByteExporter, LongTask {
         ticket.start();
         Progress.start(ticket);
 
-        String[] latAttributes = {"latitude", "^lat$", "^y$", "(.*)lat(.*)"};
-        String[] lonAttributes = {"longitude", "lon", "lng", "^x$", "(.*)lon(.*)", "(.*)lng(.*)"};
-
-        // find attributes by iterating over property names
-        AttributeModel model = Lookup.getDefault().lookup(AttributeController.class).getModel();
-        String latitudeName = getAttributeField(latAttributes, model);
-        String longitudeName = getAttributeField(lonAttributes, model);
-
-        if (latitudeName.isEmpty() || longitudeName.isEmpty()) {
-            String missingMessage = "Sorry, but we could not identify ";
-
-            if (latitudeName.isEmpty() && longitudeName.isEmpty()) {
-                missingMessage += "a latitude field or a longitude field.";
-            } else if (latitudeName.isEmpty()) {
-                missingMessage += "a latitude field.";
-            } else if (longitudeName.isEmpty()) {
-                missingMessage += "a longitude field.";
-            }
-
-            missingMessage += "This plugin cannot run. Please identify lat and lon"
-                    + " columns by adding 'lat' and 'lon' to the appropriate columns,"
-                    + " and converting them to floats, doubles, or decimals.";
-            JOptionPane.showMessageDialog(null, missingMessage,
-                    "Geocoordinates Not Found", JOptionPane.ERROR_MESSAGE);
-        }
 
         int renderablesCount = 0;
         ArrayList<NodeItem> validNodes = new ArrayList<NodeItem>();
         double invalidNodeCount = 0,
                 totalNodes = 0;
 
+        AttributeModel model = Lookup.getDefault().lookup(AttributeController.class).getModel();
         Float maxSize = new Float(0.0);
+
+        if (longitudeColumn == null || latitudeColumn == null) {
+            GeoAttributeFinder gaf = new GeoAttributeFinder(longitudeColumn, latitudeColumn);
+            gaf.findGeoFields(model.getNodeTable().getColumns());
+            setColumnsToUse(gaf.getLongitudeColumn(), gaf.getLatitudeColumn(), model.getNodeTable().getColumns());
+        }
+
         for (Item ni : previewModel.getItems(Item.NODE)) {
             Node n = (Node) ni.getSource();
             AttributeRow row = (AttributeRow) n.getNodeData().getAttributes();
@@ -138,10 +131,10 @@ public class KMZExporter implements GraphExporter, ByteExporter, LongTask {
             boolean hasLat = false,
                     hasLon = false;
 
-            if (row.getValue(latitudeName) != null) {
+            if (row.getValue(latitudeColumn) != null) {
                 hasLat = true;
             }
-            if (row.getValue(longitudeName) != null) {
+            if (row.getValue(longitudeColumn) != null) {
                 hasLon = true;
             }
 
@@ -154,12 +147,16 @@ public class KMZExporter implements GraphExporter, ByteExporter, LongTask {
             totalNodes++;
         }
 
-        float maxWeight = 0;
+        float maxWeight = 0, 
+                minWeight = 0;
         for (Item i : previewModel.getItems(Item.EDGE)) {
             Float weight = (Float) i.getData(EdgeItem.WEIGHT);
             if (weight > maxWeight) {
                 maxWeight = weight;
                 renderablesCount++;
+            }
+            if (minWeight == 0 || weight < minWeight) {
+                minWeight = weight;
             }
         }
 
@@ -202,10 +199,10 @@ public class KMZExporter implements GraphExporter, ByteExporter, LongTask {
 
             String description = "";
             for (AttributeColumn ac : model.getNodeTable().getColumns()) {
-                if ((ac.getTitle() == null ? latitudeName != null
-                        : !ac.getTitle().equals(latitudeName))
-                        && (ac.getTitle() == null ? longitudeName != null
-                        : !ac.getTitle().equals(longitudeName))) {
+                if ((ac == null ? latitudeColumn != null
+                        : !(ac == latitudeColumn)
+                        && (ac.getTitle() == null ? longitudeColumn != null
+                        : !(ac == longitudeColumn)))) {
 
                     description += ac.getTitle() + ": " + row.getValue(ac) + "\n";
 
@@ -217,11 +214,14 @@ public class KMZExporter implements GraphExporter, ByteExporter, LongTask {
             Placemark placemark = folder.createAndAddPlacemark().withName((String) row.getValue("Label")).withDescription(description);
 
             Style style = folder.createAndAddStyle().withId("style_" + styleCounter);
+            if (minWeight == maxWeight) {
+                
+            }
             style.createAndSetIconStyle().withScale((weight / maxSize) * maxScale).withIcon(new Icon().withHref(iconFilename));
 
             placemark.setStyleUrl("#style_" + styleCounter);
-            placemark.createAndSetPoint().addToCoordinates((Double) row.getValue(longitudeName),
-                    (Double) row.getValue(latitudeName));
+            placemark.createAndSetPoint().addToCoordinates((Double) row.getValue(longitudeColumn),
+                    (Double) row.getValue(latitudeColumn));
             styleCounter++;
 
             if (cancelled) {
@@ -246,10 +246,10 @@ public class KMZExporter implements GraphExporter, ByteExporter, LongTask {
             if (source == null || targe == null) {
                 continue;
             }
-            if (source.getValue(latitudeName) == null 
-                    || source.getValue(longitudeName) == null
-                    || targe.getValue(latitudeName) == null 
-                    || targe.getValue(longitudeName) == null) {
+            if (source.getValue(latitudeColumn) == null 
+                    || source.getValue(longitudeColumn) == null
+                    || targe.getValue(latitudeColumn) == null 
+                    || targe.getValue(longitudeColumn) == null) {
                 continue;
             }
             Color color = (Color) i.getData(EdgeItem.COLOR);
@@ -261,10 +261,10 @@ public class KMZExporter implements GraphExporter, ByteExporter, LongTask {
             }
             String description = "";
             for (AttributeColumn ac : model.getEdgeTable().getColumns()) {
-                if ((ac.getTitle() == null ? latitudeName != null
-                        : !ac.getTitle().equals(latitudeName))
-                        && (ac.getTitle() == null ? longitudeName != null
-                        : !ac.getTitle().equals(longitudeName))) {
+                if ((ac.getTitle() == null ? latitudeColumn != null
+                        : !ac.getTitle().equals(latitudeColumn))
+                        && (ac.getTitle() == null ? longitudeColumn != null
+                        : !ac.getTitle().equals(longitudeColumn))) {
 
                     // Filter labels with null attributes
                     if (row.getValue(ac) != null) {
@@ -285,12 +285,19 @@ public class KMZExporter implements GraphExporter, ByteExporter, LongTask {
             Placemark placemark = folder.createAndAddPlacemark().withDescription(description).withName(title);
 
             Style style = folder.createAndAddStyle().withId("style_" + styleCounter);
-            style.createAndSetLineStyle().withWidth((weight / maxWeight) * 20.0).withColorMode(ColorMode.NORMAL).withColor(colorCode);
+            
+            double edgeWidth = 0;
+            if (minWeight == maxWeight) {
+                edgeWidth = 1;
+            } else {
+                edgeWidth = (weight / maxWeight) * 20.0;
+            }
+            style.createAndSetLineStyle().withWidth(edgeWidth).withColorMode(ColorMode.NORMAL).withColor(colorCode);
             placemark.setStyleUrl("#style_" + styleCounter);
 
-            placemark.createAndSetLineString().addToCoordinates((Double) source.getValue(longitudeName),
-                    (Double) source.getValue(latitudeName), 0).addToCoordinates((Double) targe.getValue(longitudeName),
-                    (Double) targe.getValue(latitudeName), 0).withTessellate(Boolean.TRUE).withExtrude(Boolean.TRUE);
+            placemark.createAndSetLineString().addToCoordinates((Double) source.getValue(longitudeColumn),
+                    (Double) source.getValue(latitudeColumn), 0).addToCoordinates((Double) targe.getValue(longitudeColumn),
+                    (Double) targe.getValue(latitudeColumn), 0).withTessellate(Boolean.TRUE).withExtrude(Boolean.TRUE);
 
             styleCounter++;
 
@@ -311,26 +318,6 @@ public class KMZExporter implements GraphExporter, ByteExporter, LongTask {
             ticket.finish();
             return true;
         }
-    }
-
-    private String getAttributeField(String[] patterns, AttributeModel model) {
-        for (AttributeColumn col : model.getNodeTable().getColumns()) {
-            for (String str : patterns) {
-                Pattern pattern = Pattern.compile(str, Pattern.CASE_INSENSITIVE);
-                Matcher matcher = pattern.matcher(col.getTitle());
-                if (matcher.find() && (col.getType() == AttributeType.FLOAT
-                        // Make sure data is formatted correctly
-                        || col.getType() == AttributeType.DOUBLE
-                        || col.getType() == AttributeType.BIGDECIMAL
-                        || col.getType() == AttributeType.DYNAMIC_BIGDECIMAL
-                        || col.getType() == AttributeType.DYNAMIC_DOUBLE
-                        || col.getType() == AttributeType.DYNAMIC_FLOAT)) {
-
-                    return col.getTitle();
-                }
-            }
-        }
-        return "";
     }
 
     private synchronized void writeKMZ(Kml kml, IconRenderer icons) throws IOException {
