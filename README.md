@@ -1,9 +1,7 @@
 Export-To-Earth
 ===============
 
-This plugin exports gephi graphs with geocoordinates to KMZ files for Google Earth or other GIS software.
-
-** To get just the plugin, download com-hypercities-exporttoearth.nbm **
+This plugin exports gephi graphs with geocoordinates to KMZ files for Google Earth or other GIS software. To install it, use the Gephi Plugin interface.
 
 To use this plugin, go to Preview, then choose File > Export, and select "KMZ" from the dropdown menu. You can customize the fields exported, or choose which fields represent "lat" and "lon" with the Options button.
 
