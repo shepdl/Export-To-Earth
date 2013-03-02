@@ -49,6 +49,6 @@ public class KMZExporterBuilder implements GraphFileExporterBuilder {
 
     @Override
     public String getName() {
-        return "Export to Earth";
+        return "KMZ File Export";
     }
 }

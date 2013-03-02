@@ -17,6 +17,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.border.EmptyBorder;
 import org.gephi.data.attributes.api.AttributeColumn;
 
 /**
@@ -91,17 +92,22 @@ public class AttributeColumnSelectionPanel extends JPanel {
         columnNames = new HashMap<String, AttributeColumn>();
         checkBoxesToColumns = new HashMap<JCheckBox, AttributeColumn>();
 
+        setBorder(new EmptyBorder(10, 10, 10, 10));
         // for each column, create a new label, checkbox, lat radio button and lon radio button
-        GridLayout layout = new GridLayout(0, 4);
+        GridLayout layout = new GridLayout(0, 3);
         setLayout(layout);
+        //add(new JLabel("Column name"));
+        add(new JLabel("Include column?"));
+        add(new JLabel("Longitude"));
+        add(new JLabel("Latitude"));
 
         for (AttributeColumn column : allColumns) {
             String title = column.getTitle();
             columnNames.put(title, column);
             JLabel label = new JLabel(title);
-            add(label);
+            //add(label);
             
-            JCheckBox checkbox = new JCheckBox();
+            JCheckBox checkbox = new JCheckBox(title);
             // TODO: set item responder
             checkBoxesToColumns.put(checkbox, column);
             checkbox.addItemListener(columnSelectorResponder);
@@ -109,6 +115,13 @@ public class AttributeColumnSelectionPanel extends JPanel {
                 checkbox.setSelected(true);
             }
             add(checkbox);
+
+            JRadioButton lonButton = new JRadioButton();
+            lonButton.addActionListener(longitudeColumnSelector);
+            if (column == longitudeColumn) {
+                lonButton.setSelected(true);
+            }
+            add(lonButton);
 
             JRadioButton latButton = new JRadioButton();
             latButton.addActionListener(latitudeColumnSelector);
@@ -118,16 +131,9 @@ public class AttributeColumnSelectionPanel extends JPanel {
             }
             add(latButton);
 
-            JRadioButton lonButton = new JRadioButton(title);
-            lonButton.addActionListener(longitudeColumnSelector);
-            if (column == longitudeColumn) {
-                lonButton.setSelected(true);
-            }
-            add(lonButton);
             
         }
         // checkboxes are stored in a hash of objects, item to column name
-        // TODO: save geo fields and required fields
     }
 
     public AttributeColumn getLongitudeColumn() {

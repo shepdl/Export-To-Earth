@@ -69,6 +69,5 @@ public class KMZExporterUI implements ExporterUI {
     public String getDisplayName() {
         return "Select latitude and longitude fields";
     }
-
     
 }
