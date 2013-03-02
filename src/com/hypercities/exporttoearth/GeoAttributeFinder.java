@@ -14,11 +14,6 @@ public class GeoAttributeFinder {
     private AttributeColumn longitudeColumn;
     private AttributeColumn latitudeColumn;
 
-    public GeoAttributeFinder(AttributeColumn lonAttributeColumn, AttributeColumn latAttributeColumn) {
-        this.longitudeColumn = lonAttributeColumn;
-        this.latitudeColumn = latAttributeColumn;
-    }
-
     AttributeColumn[] findGeoFields(AttributeColumn[] columns) {
         String[] latAttributes = {"latitude", "^lat$", "^y$", "(.*)lat(.*)"};
         String[] lonAttributes = {"longitude", "lon", "lng", "^x$", "(.*)lon(.*)", "(.*)lng(.*)"};

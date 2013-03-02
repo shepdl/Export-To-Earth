@@ -105,6 +105,9 @@ public class AttributeColumnSelectionPanel extends JPanel {
             // TODO: set item responder
             checkBoxesToColumns.put(checkbox, column);
             checkbox.addItemListener(columnSelectorResponder);
+            if (column != longitudeColumn && column != latitudeColumn) {
+                checkbox.setSelected(true);
+            }
             add(checkbox);
 
             JRadioButton latButton = new JRadioButton();

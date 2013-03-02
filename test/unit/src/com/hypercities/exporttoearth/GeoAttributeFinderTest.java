@@ -1,21 +1,19 @@
 package com.hypercities.exporttoearth;
 
-import javax.swing.JPanel;
 import org.gephi.data.attributes.api.AttributeColumn;
 import org.gephi.data.attributes.api.AttributeType;
-import org.gephi.io.exporter.spi.Exporter;
 import org.junit.AfterClass;
+import static org.junit.Assert.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
  * @author Dave Shepard
  */
-public class KMZExporterUITest {
+public class GeoAttributeFinderTest {
     
-    public KMZExporterUITest() {
+    public GeoAttributeFinderTest() {
     }
     
     @BeforeClass
@@ -26,9 +24,6 @@ public class KMZExporterUITest {
     public static void tearDownClass() {
     }
 
-    /**
-     * Test of findGeoFields method, of class KMZExporterUI.
-     */
     @Test
     public void testFindGeoFieldsWithLatitudeAndLongitude() {
         AttributeColumn[] columns = {
@@ -37,7 +32,7 @@ public class KMZExporterUITest {
             new MockAttributeColumn("latitude", AttributeType.DOUBLE),
             new MockAttributeColumn("longitude", AttributeType.DOUBLE)
         };
-        KMZExporterUI instance = new KMZExporterUI();
+        GeoAttributeFinder instance = new GeoAttributeFinder();
         AttributeColumn[] resultColumns = instance.findGeoFields(columns);
         // TODO review the generated test code and remove the default call to fail.
         assertNotNull("Longitude not found.", resultColumns[0]);
@@ -51,7 +46,7 @@ public class KMZExporterUITest {
             new MockAttributeColumn("PlaceLatitudeInDegrees", AttributeType.DOUBLE),
             new MockAttributeColumn("PlaceLongitudeInDegrees", AttributeType.DOUBLE)
         };
-        KMZExporterUI instance = new KMZExporterUI();
+        GeoAttributeFinder instance = new GeoAttributeFinder();
         AttributeColumn[] resultColumns = instance.findGeoFields(columns);
         // TODO review the generated test code and remove the default call to fail.
         assertNotNull("PlaceLongitudeInDegrees not found.", resultColumns[0]);
@@ -65,7 +60,7 @@ public class KMZExporterUITest {
             new MockAttributeColumn("latitude", AttributeType.STRING),
             new MockAttributeColumn("longitude", AttributeType.STRING)
         };
-        KMZExporterUI instance = new KMZExporterUI();
+        GeoAttributeFinder instance = new GeoAttributeFinder();
         AttributeColumn[] resultColumns = instance.findGeoFields(columns);
         assertNull("Longitude found even though it's a string.", resultColumns[0]);
         assertNull("Latitude found even though it's a string.", resultColumns[1]);
@@ -78,7 +73,7 @@ public class KMZExporterUITest {
             new MockAttributeColumn("lat", AttributeType.DOUBLE),
             new MockAttributeColumn("lon", AttributeType.DOUBLE)
         };
-        KMZExporterUI instance = new KMZExporterUI();
+        GeoAttributeFinder instance = new GeoAttributeFinder();
         AttributeColumn[] resultColumns = instance.findGeoFields(columns);
         assertNotNull("Lon not found", resultColumns[0]);
         assertNotNull("Lat not found", resultColumns[1]);
@@ -91,7 +86,7 @@ public class KMZExporterUITest {
             new MockAttributeColumn("lat", AttributeType.DOUBLE),
             new MockAttributeColumn("lng", AttributeType.DOUBLE)
         };
-        KMZExporterUI instance = new KMZExporterUI();
+        GeoAttributeFinder instance = new GeoAttributeFinder();
         AttributeColumn[] resultColumns = instance.findGeoFields(columns);
         assertNotNull("lng not found", resultColumns[0]);
         assertNotNull("lat not found", resultColumns[1]);
@@ -104,7 +99,7 @@ public class KMZExporterUITest {
             new MockAttributeColumn("x", AttributeType.DOUBLE),
             new MockAttributeColumn("y", AttributeType.DOUBLE)
         };
-        KMZExporterUI instance = new KMZExporterUI();
+        GeoAttributeFinder instance = new GeoAttributeFinder();
         AttributeColumn[] resultColumns = instance.findGeoFields(columns);
         assertNotNull("Y not found", resultColumns[0]);
         assertNotNull("X not found", resultColumns[1]);

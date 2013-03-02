@@ -114,7 +114,7 @@ public class KMZExporter implements GraphExporter, ByteExporter, LongTask {
         Float maxSize = new Float(0.0);
 
         if (longitudeColumn == null || latitudeColumn == null) {
-            GeoAttributeFinder gaf = new GeoAttributeFinder(longitudeColumn, latitudeColumn);
+            GeoAttributeFinder gaf = new GeoAttributeFinder();
             gaf.findGeoFields(model.getNodeTable().getColumns());
             setColumnsToUse(gaf.getLongitudeColumn(), gaf.getLatitudeColumn(), model.getNodeTable().getColumns());
         }
@@ -186,7 +186,6 @@ public class KMZExporter implements GraphExporter, ByteExporter, LongTask {
         ticket.setDisplayName("Finding nodes");
         ticket.start(validNodes.size());
 
-        HashMap<Integer, Color> modularityClassColors = new HashMap<Integer, Color>();
         IconRenderer renderer = new IconRenderer();
 
         double maxScale = 2.0;
@@ -198,18 +197,8 @@ public class KMZExporter implements GraphExporter, ByteExporter, LongTask {
             Float weight = (Float) ni.getData(NodeItem.SIZE);
 
             String description = "";
-            for (AttributeColumn ac : model.getNodeTable().getColumns()) {
-                if ((ac == null ? latitudeColumn != null
-                        : !(ac == latitudeColumn)
-                        && (ac.getTitle() == null ? longitudeColumn != null
-                        : !(ac == longitudeColumn)))) {
-
-                    description += ac.getTitle() + ": " + row.getValue(ac) + "\n";
-
-                    if (ac.getTitle().equals("Modularity Class")) {
-                        modularityClassColors.put((Integer) row.getValue(ac), (Color) ni.getData(NodeItem.COLOR));
-                    }
-                }
+            for (AttributeColumn ac : columnsToExport) {
+                description += ac.getTitle() + ": " + row.getValue(ac) + "\n";
             }
             Placemark placemark = folder.createAndAddPlacemark().withName((String) row.getValue("Label")).withDescription(description);
 
@@ -230,11 +219,12 @@ public class KMZExporter implements GraphExporter, ByteExporter, LongTask {
         }
 
         if (styleCounter == 0) {
-            JOptionPane.showMessageDialog(null, "Sorry, we could not locate the preivew.\n"
+            JOptionPane.showMessageDialog(null, "Sorry, the Preview has not been rendred correctly.\n"
                     + " Please try switching to Preview mode and running the plugin again.");
             return false;
         }
 
+        ticket.setDisplayName("Exporting edges");
         // 2b. produce edges
         for (Item i : previewModel.getItems(Item.EDGE)) {
             Edge e = (Edge) i.getSource();

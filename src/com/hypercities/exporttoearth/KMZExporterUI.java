@@ -1,12 +1,9 @@
 package com.hypercities.exporttoearth;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.swing.JPanel;
 import org.gephi.data.attributes.api.AttributeColumn;
 import org.gephi.data.attributes.api.AttributeController;
 import org.gephi.data.attributes.api.AttributeModel;
-import org.gephi.data.attributes.api.AttributeType;
 import org.gephi.io.exporter.spi.Exporter;
 import org.gephi.io.exporter.spi.ExporterUI;
 import org.openide.util.Lookup;
@@ -32,7 +29,7 @@ public class KMZExporterUI implements ExporterUI {
         AttributeColumn[] columns = model.getNodeTable().getColumns();
 
         // get geocoordinate fields
-        GeoAttributeFinder gaf = new GeoAttributeFinder(longitudeColumn, latitudeColumn);
+        GeoAttributeFinder gaf = new GeoAttributeFinder();
         gaf.findGeoFields(columns);
         longitudeColumn = gaf.getLongitudeColumn();
         latitudeColumn = gaf.getLatitudeColumn();
