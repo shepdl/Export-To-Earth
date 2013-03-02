@@ -5,13 +5,7 @@ This plugin exports gephi graphs with geocoordinates to KMZ files for Google Ear
 
 ** To get just the plugin, download com-hypercities-exporttoearth.nbm **
 
-To use this plugin, go to Preview, then choose File > Export, and select "KMZ" from the dropdown menu. It should do the rest.
-
-Before running this, make sure your Nodes table has geocoordinate columns. The plugin looks for columns in the following order:
-* For latitude: columns named "latitude," columns named "lat," columns with the words "latitude" or "lat" in them. 
-* For longitude: columns named "longitude," columns named "lon," columns named "lng", columns with the words "longitude," "lon," or "lng" in them.
-
-All comparisons are case-insensitive. The columns must also have a numerical type like float, decimal, or double.
+To use this plugin, go to Preview, then choose File > Export, and select "KMZ" from the dropdown menu. You can customize the fields exported, or choose which fields represent "lat" and "lon" with the Options button.
 
 This plugin attempts to preserve the appearance of your graph preview as best as possible (aside from moving the nodes and edges to the appropriate geocoordinates). Node colors are preserved from how they have been assigned in Gephi. Edges are always white.
 

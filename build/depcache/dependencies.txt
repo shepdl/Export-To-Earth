@@ -110,7 +110,6 @@ java.lang.Throwable
 javax.swing.JOptionPane
 java.lang.Boolean
 org.gephi.data.attributes.api.AttributeTable
-java.util.HashMap
 java.awt.Color
 org.gephi.data.attributes.api.AttributeController
 org.gephi.graph.api.Node
@@ -139,6 +138,7 @@ org.gephi.data.attributes.api.AttributeModel
 javax.swing.JPanel
 java.awt.GridLayout
 org.gephi.data.attributes.api.AttributeColumn
+javax.swing.border.EmptyBorder
 java.util.ArrayList
 com.hypercities.exporttoearth.AttributeColumnSelectionPanel$3
 com.hypercities.exporttoearth.AttributeColumnSelectionPanel$2
