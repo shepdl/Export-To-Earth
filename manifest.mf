@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-OpenIDE-Module: com.hypercities.exporttoearth/2
+OpenIDE-Module: com.hypercities.exporttoearth/3
 OpenIDE-Module-Localizing-Bundle: com/hypercities/exporttoearth/Bundle.properties
-OpenIDE-Module-Specification-Version: 2
+OpenIDE-Module-Specification-Version: 3
 
