@@ -29,6 +29,7 @@ import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -47,8 +48,10 @@ import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewController;
 import org.gephi.preview.api.PreviewModel;
 import org.gephi.preview.api.PreviewProperties;
+import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.plugin.items.EdgeItem;
 import org.gephi.preview.plugin.items.NodeItem;
+import org.gephi.preview.types.EdgeColor;
 import org.gephi.project.api.Workspace;
 import org.gephi.utils.longtask.spi.LongTask;
 import org.gephi.utils.progress.Progress;
@@ -186,6 +189,8 @@ public class KMZExporter implements GraphExporter, ByteExporter, LongTask {
         ticket.setDisplayName("Finding nodes");
         ticket.start(validNodes.size());
 
+        HashMap<Integer, Color> modularityClassColors = new HashMap<Integer, Color>();
+        HashMap<Integer, Color> nodeColors = new HashMap<Integer, Color>();
         IconRenderer renderer = new IconRenderer();
 
         double maxScale = 2.0;
@@ -200,12 +205,11 @@ public class KMZExporter implements GraphExporter, ByteExporter, LongTask {
             for (AttributeColumn ac : columnsToExport) {
                 description += ac.getTitle() + ": " + row.getValue(ac) + "\n";
             }
+            
+            nodeColors.put(n.getId(), (Color) ni.getData(NodeItem.COLOR));
             Placemark placemark = folder.createAndAddPlacemark().withName((String) row.getValue("Label")).withDescription(description);
 
             Style style = folder.createAndAddStyle().withId("style_" + styleCounter);
-            if (minWeight == maxWeight) {
-                
-            }
             style.createAndSetIconStyle().withScale((weight / maxSize) * maxScale).withIcon(new Icon().withHref(iconFilename));
 
             placemark.setStyleUrl("#style_" + styleCounter);
@@ -226,6 +230,7 @@ public class KMZExporter implements GraphExporter, ByteExporter, LongTask {
 
         ticket.setDisplayName("Exporting edges");
         // 2b. produce edges
+        EdgeColor ec = previewModel.getProperties().getValue(PreviewProperty.EDGE_COLOR);
         for (Item i : previewModel.getItems(Item.EDGE)) {
             Edge e = (Edge) i.getSource();
             AttributeRow row = (AttributeRow) e.getAttributes();
@@ -242,7 +247,6 @@ public class KMZExporter implements GraphExporter, ByteExporter, LongTask {
                     || targe.getValue(longitudeColumn) == null) {
                 continue;
             }
-            Color color = (Color) i.getData(EdgeItem.COLOR);
             float weight = (Float) i.getData(EdgeItem.WEIGHT);
 
             String title = i.getData(EdgeItem.EDGE_LABEL);
@@ -264,6 +268,27 @@ public class KMZExporter implements GraphExporter, ByteExporter, LongTask {
             }
 
             // Default is whitish
+            
+            
+            Color color = i.getData(EdgeItem.COLOR);
+            switch(ec.getMode()) {
+                case SOURCE:
+                    color = nodeColors.get(e.getSource().getId());
+                    break;
+                case TARGET:
+                    color = nodeColors.get(e.getTarget().getId());
+                    break;
+                case MIXED:
+                    EdgeColor tempEdgeColor = new EdgeColor(ec.getMode());
+                    color = tempEdgeColor.getColor(null, 
+                            nodeColors.get(e.getSource().getId()), 
+                            nodeColors.get(e.getTarget().getId())
+                    );
+                    break;
+                default:
+                    color = (Color) i.getData(EdgeItem.COLOR);
+            }
+            
             String colorCode = "#33ffffff";
             if (color != null) {
                 colorCode = "#" + Integer.toHexString(color.getAlpha()) + ""
