@@ -223,7 +223,7 @@ public class KMZExporter implements GraphExporter, ByteExporter, LongTask {
         }
 
         if (styleCounter == 0) {
-            JOptionPane.showMessageDialog(null, "Sorry, the Preview has not been rendred correctly.\n"
+            JOptionPane.showMessageDialog(null, "Sorry, the Preview has not been rendered correctly.\n"
                     + " Please try switching to Preview mode and running the plugin again.");
             return false;
         }
