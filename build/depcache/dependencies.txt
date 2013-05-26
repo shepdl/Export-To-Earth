@@ -64,6 +64,7 @@ java.lang.Object
 [Lorg.gephi.data.attributes.api.AttributeColumn;
 java.lang.String
 ||:com.hypercities.exporttoearth.KMZExporter
+com.hypercities.exporttoearth.KMZExporter$1
 java.lang.Class
 org.gephi.utils.progress.Progress
 org.gephi.io.exporter.spi.ByteExporter
@@ -107,10 +108,13 @@ org.gephi.data.attributes.api.AttributeRow
 org.gephi.utils.longtask.spi.LongTask
 java.lang.Object
 java.lang.Throwable
+org.gephi.preview.types.EdgeColor$Mode
 javax.swing.JOptionPane
 java.lang.Boolean
 org.gephi.data.attributes.api.AttributeTable
+java.util.HashMap
 java.awt.Color
+org.gephi.preview.types.EdgeColor
 org.gephi.data.attributes.api.AttributeController
 org.gephi.graph.api.Node
 org.gephi.preview.api.PreviewModel
@@ -151,3 +155,10 @@ javax.swing.JLabel
 com.hypercities.exporttoearth.AttributeColumnSelectionPanel
 java.lang.String
 javax.swing.JRadioButton
+||:com.hypercities.exporttoearth.KMZExporter$1
+java.lang.Object
+org.gephi.preview.types.EdgeColor
+com.hypercities.exporttoearth.KMZExporter
+java.lang.NoSuchFieldError
+org.gephi.preview.types.EdgeColor$Mode
+com.hypercities.exporttoearth.KMZExporter$1
